@@ -9,3 +9,5 @@ refined_dataset = datasets.pdbbind(home=refined_dir, default_set="refined", vers
 
 core_dir = os.path.join(base_dir, "core-set")
 core_dataset = datasets.pdbbind(home=core_dir, default_set="core", version=2016)
+
+uses_mk = False
