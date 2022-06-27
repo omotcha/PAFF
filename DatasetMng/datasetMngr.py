@@ -11,7 +11,7 @@ def get_index():
     """
     refined_ids = list(refined_dataset.sets['refined'].keys())
     core_ids = list(core_dataset.sets['core'].keys())
-    refined_ids = [i for i in refined_ids if i not in core_ids]
+    # refined_ids = [i for i in refined_ids if i not in core_ids]
     return refined_ids, core_ids
 
 

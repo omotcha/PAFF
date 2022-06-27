@@ -4,7 +4,6 @@ from DatasetMng.datasetMngr import *
 from tqdm import *
 from config import *
 from rdkit import Chem
-from util import moleculePrinter
 import numpy as np
 import os
 
