@@ -112,11 +112,11 @@ class ECIF:
 
     # helpers for loading ligands and proteins
 
-    def load_ligand(self, sdf):
+    def _load_ligand(self, sdf):
         """
-
+        This function takes an SDF for a ligand as input and returns it as a pandas DataFrame with its atom types labeled according to ECIF
         :param sdf: ligand file
-        :return: a pandas DataFrame with ECIF::atom_types
+        :return: a pandas DataFrame for the ligand with ECIF::atom_types
         """
         # This function takes an SDF for a ligand as input and returns it as a pandas DataFrame
 
@@ -141,12 +141,104 @@ class ECIF:
             print("WARNING: Ligand contains unsupported atom types. Only supported atom-type pairs are counted.")
         return (df)
 
+    def _load_protein(self, pdb):
+        """
+        This function takes a PDB for a protein as input and returns it as a pandas DataFrame with its atom types labeled according to ECIF
+        :param pdb: protein file
+        :return: a pandas DataFrame for the protein with ECIF::atom_types
+        """
+        Atom_Keys = pd.read_csv("../ECIF_PDB_Atom_Keys.csv", sep=",")
+        ECIF_atoms = []
+
+        f = open(pdb)
+        for i in f:
+            if i[:4] == "ATOM":
+                # Include only non-hydrogen atoms
+                if (len(i[12:16].replace(" ", "")) < 4 and i[12:16].replace(" ", "")[0] != "H") or (
+                        len(i[12:16].replace(" ", "")) == 4 and i[12:16].replace(" ", "")[1] != "H" and
+                        i[12:16].replace(" ", "")[0] != "H"):
+                    ECIF_atoms.append([int(i[6:11]),
+                                       i[17:20] + "-" + i[12:16].replace(" ", ""),
+                                       float(i[30:38]),
+                                       float(i[38:46]),
+                                       float(i[46:54])
+                                       ])
+
+        f.close()
+
+        df = pd.DataFrame(ECIF_atoms, columns=["ATOM_INDEX", "PDB_ATOM", "X", "Y", "Z"])
+        df = df.merge(Atom_Keys, left_on='PDB_ATOM', right_on='PDB_ATOM')[
+            ["ATOM_INDEX", "ECIF_ATOM_TYPE", "X", "Y", "Z"]].sort_values(by="ATOM_INDEX").reset_index(drop=True)
+        if list(df["ECIF_ATOM_TYPE"].isna()).count(True) > 0:
+            print("WARNING: Protein contains unsupported atom types. Only supported atom-type pairs are counted.")
+        return (df)
+
+    def _get_pl_pairs(self, protein_f, ligand_f, distance_cutoff=6.0):
+        """
+        This function returns the protein-ligand atom-type pairs for a given distance cutoff
+        :param protein_f: pdb file name with dir
+        :param ligand_f:  sdf file name with dir
+        :param distance_cutoff:
+        :return:
+        """
+
+        Target = self._load_protein(protein_f)
+        Ligand = self._load_ligand(ligand_f)
+
+        for i in ["X", "Y", "Z"]:
+            Target = Target[Target[i] < float(Ligand[i].max()) + distance_cutoff]
+            Target = Target[Target[i] > float(Ligand[i].min()) - distance_cutoff]
+
+        # Get all possible pairs
+        Pairs = list(product(Target["ECIF_ATOM_TYPE"], Ligand["ECIF_ATOM_TYPE"]))
+        Pairs = [x[0] + "-" + x[1] for x in Pairs]
+        Pairs = pd.DataFrame(Pairs, columns=["ECIF_PAIR"])
+        Distances = cdist(Target[["X", "Y", "Z"]], Ligand[["X", "Y", "Z"]], metric="euclidean")
+        Distances = Distances.reshape(Distances.shape[0] * Distances.shape[1], 1)
+        Distances = pd.DataFrame(Distances, columns=["DISTANCE"])
+
+        Pairs = pd.concat([Pairs, Distances], axis=1)
+        Pairs = Pairs[Pairs["DISTANCE"] <= distance_cutoff].reset_index(drop=True)
+        # Pairs from ELEMENTS could be easily obtained froms pairs from ECIF
+        Pairs["ELEMENTS_PAIR"] = [x.split("-")[0].split(";")[0] + "-" + x.split("-")[1].split(";")[0] for x in
+                                  Pairs["ECIF_PAIR"]]
+        return Pairs
+
     # callables
-    def get_ligand_features_by_file(self, ligand_file):
-        ligand = Chem.MolFromMolFile(ligand_file, sanitize=False)
+    def get_ligand_features_by_file(self, ligand_f):
+        """
+        calculate ligand descriptors using RDKit
+        :param ligand_f: sdf file name with dir
+        :return:
+        """
+        ligand = Chem.MolFromMolFile(ligand_f, sanitize=False)
         ligand.UpdatePropertyCache(strict=False)
         Chem.GetSymmSSSR(ligand)
         return self._DescCalc.CalcDescriptors(ligand)
+
+    def get_ecif(self, protein_f, ligand_f, distance_cutoff=6.0):
+        """
+        get the fingerprint-like array (ECIF) for a protein-ligand pair
+        :param protein_f: pdb file name with dir
+        :param ligand_f: sdf file name with dir
+        :param distance_cutoff:
+        :return:
+        """
+        Pairs = self._get_pl_pairs(protein_f, ligand_f, distance_cutoff=distance_cutoff)
+        ECIF = [list(Pairs["ECIF_PAIR"]).count(x) for x in self._get_possible_ecif()]
+        return ECIF
+
+    def get_elements(self, protein_f, ligand_f, distance_cutoff=6.0):
+        """
+        get the fingerprint-like array (ELEMENTS) for a protein-ligand pair
+        :param protein_f: pdb file name with dir
+        :param ligand_f: sdf file name with dir
+        :param distance_cutoff:
+        :return:
+        """
+        Pairs = self._get_pl_pairs(protein_f, ligand_f, distance_cutoff=distance_cutoff)
+        ELEMENTS = [list(Pairs["ELEMENTS_PAIR"]).count(x) for x in self._get_possible_element()]
+        return ELEMENTS
 
     def __init__(self, version=2016):
         self._ds_version = version
@@ -154,8 +246,9 @@ class ECIF:
 
 def my_test():
     ligand_file = os.path.join(tmpdata_dir, '1a0q_ligandCD1.sdf')
+    protein_file = os.path.join(tmpdata_dir, '1a0q_protein.pdb')
     ecif_helper = ECIF(2016)
-    print(ecif_helper.load_ligand(ligand_file))
+    print(ecif_helper.get_elements(protein_file, ligand_file, distance_cutoff=6.0))
 
 
 if __name__ == '__main__':
