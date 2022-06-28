@@ -240,6 +240,15 @@ class ECIF:
         ELEMENTS = [list(Pairs["ELEMENTS_PAIR"]).count(x) for x in self._get_possible_element()]
         return ELEMENTS
 
+    def get_possible_ecif(self):
+        return self._get_possible_ecif()
+
+    def get_possible_elements(self):
+        return self._get_possible_element()
+
+    def get_ligand_descriptors(self):
+        return self._LigandDescriptors
+
     def __init__(self, version=2016):
         self._ds_version = version
 

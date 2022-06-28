@@ -8,8 +8,12 @@
       <excludeFolder url="file://$MODULE_DIR$/tfbioSupport" />
       <excludeFolder url="file://$MODULE_DIR$/tmpdata" />
       <excludeFolder url="file://$MODULE_DIR$/Preprocess/.pytest_cache/v" />
+      <excludeFolder url="file://$MODULE_DIR$/DatasetMng/.pytest_cache/v" />
+      <excludeFolder url="file://$MODULE_DIR$/train/.pytest_cache/v" />
+      <excludeFolder url="file://$MODULE_DIR$/util/.pytest_cache/v" />
+      <excludeFolder url="file://$MODULE_DIR$/model" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.6 (pafnucy_env)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.9" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>
