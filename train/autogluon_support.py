@@ -1,9 +1,11 @@
+import sklearn.metrics
 from autogluon.tabular import TabularDataset, TabularPredictor
 import os
 from config import *
 from util.ECIF import *
 import csv
 from DatasetMng import IndexMng
+from autogluon.core.metrics import make_scorer
 
 
 def get_ecif_dict():
@@ -50,8 +52,15 @@ def train_with_autogluon(distance_cutoffs, split_factor):
                 test_size=split_factor if 0 < split_factor < 1 else 0.25,
                 random_state=0)
         print("training...\n")
-        TabularPredictor(label='pK').fit(train_data=train_x.join(train_y))
+        ag_r2_scorer = make_scorer(name='r2',
+                                   score_func=sklearn.metrics.r2_score,
+                                   optimum=1,
+                                   greater_is_better=True)
+        predictor = TabularPredictor(label='pK',
+                                     eval_metric='root_mean_squared_error').fit(train_data=train_x.join(train_y))
         print("\n - finished -\n")
+        leaderboard = predictor.leaderboard(test_x.join(test_y), extra_metrics=[ag_r2_scorer], silent=True)
+        print(leaderboard[['model', 'score_val', 'r2']])
 
 
 def predict_with_autogluon_by_id(ids, d, model_dir, select_model=None):
@@ -104,7 +113,7 @@ def predict_with_autogluon_by_id(ids, d, model_dir, select_model=None):
 
 
 def exp_step_1():
-    train_with_autogluon(['6.0'], split_factor=0.1)
+    train_with_autogluon(['6.0'], split_factor=False)
 
 
 def exp_step_2():
@@ -115,9 +124,9 @@ def exp_step_2():
         select_model=False)
 
 
-def test():
-    exp_step_2()
+def my_test():
+    exp_step_1()
 
 
 if __name__ == '__main__':
-    test()
+    my_test()
