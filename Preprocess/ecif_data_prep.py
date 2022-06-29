@@ -6,18 +6,19 @@ from util.ECIF import *
 from tqdm import tqdm
 
 
-def get_ecif_ids():
-    ids = []
+def get_ecif_dict():
+    ret = {}
     with open('BindingData.csv', 'r') as f:
         f.readline()
         reader = csv.reader(f)
         for row in reader:
-            ids.append(row[0])
-    return ids
+            ret[row[0]] = row[2]
+    return ret
 
 
 def collect_ecif(distance_cutoffs):
-    ecif_ids = get_ecif_ids()
+    ecif_dict = get_ecif_dict()
+    ecif_ids = ecif_dict.keys()
     ecif_core_ids = IndexMng.get_index_from_dir(ecif_core)
     ecif_2016_refined_ids = IndexMng.get_index_from_dir(ecif_2016_refined)
     ecif_2019_refined_ids = IndexMng.get_index_from_dir(ecif_2019_refined)
@@ -77,7 +78,8 @@ def collect_ecif(distance_cutoffs):
 
 
 def collect_ld():
-    ecif_ids = get_ecif_ids()
+    ecif_dict = get_ecif_dict()
+    ecif_ids = ecif_dict.keys()
     ecif_core_ids = IndexMng.get_index_from_dir(ecif_core)
     ecif_2016_refined_ids = IndexMng.get_index_from_dir(ecif_2016_refined)
     ecif_2019_refined_ids = IndexMng.get_index_from_dir(ecif_2019_refined)
