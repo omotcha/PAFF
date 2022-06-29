@@ -3,3 +3,8 @@ tfbioSupport/
 tmpdata/
 /Preprocess/pdb_1.ids
 /model/
+/DatasetMng/.pytest_cache/
+/Preprocess/.pytest_cache/
+/train/.pytest_cache/
+/train/AutogluonModels/
+/util/.pytest_cache/

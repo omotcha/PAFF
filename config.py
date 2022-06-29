@@ -15,3 +15,6 @@ ecif_2019_refined = "D:\\AlexYu\\datasets\\dataset\\pdbbind2019\\refined-set"
 ecif_2019_general_minus_refined = "D:\\AlexYu\\datasets\\dataset\\pdbbind2019\\general-minus-refined"
 ecif_core = "D:\\AlexYu\\datasets\\dataset\\pdbbind2016\\coreset"
 ecif_model_dir = os.path.join(project_dir, 'model', 'ecif')
+
+# for autogluon
+autogluon_model_dir = os.path.join(project_dir, 'train', 'AutogluonModels')
