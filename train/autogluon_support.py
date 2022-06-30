@@ -119,15 +119,23 @@ def predict_with_autogluon_by_id(ids, d, model_dir, select_model=None):
 
 
 def exp_step_1():
-    train_with_autogluon(['6.0'], split_factor=None, tag='ign')
+    train_with_autogluon(['6.0'], split_factor=None, tag='ign2013')
 
 
 def exp_step_2():
+
+    # using ECIF-given dataset
     predict_with_autogluon_by_id(
         ids=['1a1b', '1a0q', '1a1c', '1a3e', '1a4h'],
         d='6.0',
-        # model_dir=os.path.join(autogluon_model_dir, 'ag-20220629_071709'),
-        model_dir=os.path.join(autogluon_model_dir, 'ag-20220630_033921'),
+        model_dir=os.path.join(autogluon_model_dir, 'ag-20220629_084956'),
+        select_model=False)
+
+    # using IGN-given dataset, test set: pdb2016 - core set
+    predict_with_autogluon_by_id(
+        ids=['1a1b', '1a0q', '1a1c', '1a3e', '1a4h'],
+        d='6.0',
+        model_dir=os.path.join(autogluon_model_dir, 'ag-20220630_044546'),
         select_model=False)
 
 

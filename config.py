@@ -21,3 +21,4 @@ autogluon_model_dir = os.path.join(project_dir, 'train', 'AutogluonModels')
 
 # for IGN
 ign_index_dir = os.path.join(tmpdata_dir, 'ign_index')
+core2013_dir = "D:\\AlexYu\\datasets\\dataset\\pdbbind2013\\coreset"

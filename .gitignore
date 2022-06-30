@@ -10,3 +10,4 @@ tmpdata/
 /util/.pytest_cache/
 /Preprocess/BindingData.csv
 /Preprocess/BindingData_ign.csv
+/Preprocess/BindingData_ign2013.csv
