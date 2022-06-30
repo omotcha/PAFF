@@ -18,3 +18,6 @@ ecif_model_dir = os.path.join(project_dir, 'model', 'ecif')
 
 # for autogluon
 autogluon_model_dir = os.path.join(project_dir, 'train', 'AutogluonModels')
+
+# for IGN
+ign_index_dir = os.path.join(tmpdata_dir, 'ign_index')

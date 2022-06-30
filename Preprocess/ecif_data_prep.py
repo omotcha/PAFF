@@ -1,9 +1,14 @@
+import pandas as pd
+
 from config import *
 import os
 import csv
 from DatasetMng import IndexMng
 from util.ECIF import *
 from tqdm import tqdm
+
+# make sure affinity data exists in /tmpdata, it can be created by pafnucy_data_prep
+affinity_data = pd.read_csv(os.path.join(tmpdata_dir, 'affinity_data_1.csv'), comment='#')
 
 
 def get_ecif_dict():
@@ -16,19 +21,46 @@ def get_ecif_dict():
     return ret
 
 
-def collect_ecif(distance_cutoffs):
-    ecif_dict = get_ecif_dict()
-    ecif_ids = ecif_dict.keys()
+def get_all_ign_index():
+    with open(os.path.join(ign_index_dir, 'train.index.txt'), 'r') as ftr:
+        tr = [i[0:4] for i in ftr.readlines()]
+    with open(os.path.join(ign_index_dir, 'valid.index.txt'), 'r') as fv:
+        vl = [i[0:4] for i in fv.readlines()]
+    with open(os.path.join(ign_index_dir, 'test.index.txt'), 'r') as fte:
+        te = [i[0:4] for i in fte.readlines()]
+    return tr + te
+
+
+def collect_ecif(distance_cutoffs, indices=None, tag=None):
+    """
+    collect ECIF and ELEMENTS data from pdb files and sdf files
+    :param distance_cutoffs:
+    :param indices: given ids for extra experiments,
+                    note that currently this set of index should be subset of that of ECIF,
+                    otherwise the not-included part would not be collected
+    :param tag:     for extra experiments, to make a distinction between files created by ECIF
+    :return:
+    """
+    if indices is not None:
+        ecif_ids = indices
+    else:
+        ecif_dict = get_ecif_dict()
+        ecif_ids = ecif_dict.keys()
     ecif_core_ids = IndexMng.get_index_from_dir(ecif_core)
     ecif_2016_refined_ids = IndexMng.get_index_from_dir(ecif_2016_refined)
     ecif_2019_refined_ids = IndexMng.get_index_from_dir(ecif_2019_refined)
     ecif_2019_general_minus_refined_ids = IndexMng.get_index_from_dir(ecif_2019_general_minus_refined)
     helper = ECIF(2016)
     print("\nCollecting ECIF and ELEMENTS data: ")
+    not_listed_ids = set()
     for d in distance_cutoffs:
         print("\n distance_cutoff: {}\n".format(d))
-        f_ecif = open(os.path.join(tmpdata_dir, 'ecif_data', 'ECIF_{}.csv'.format(d)), 'a', newline='')
-        f_elements = open(os.path.join(tmpdata_dir, 'ecif_data', 'ELEMENTS_{}.csv'.format(d)), 'a', newline='')
+        if tag is not None:
+            f_ecif = open(os.path.join(tmpdata_dir, 'ecif_data', 'ECIF_{}_{}.csv'.format(d, tag)), 'a', newline='')
+            f_elements = open(os.path.join(tmpdata_dir, 'ecif_data', 'ELEMENTS_{}_{}.csv'.format(d, tag)), 'a', newline='')
+        else:
+            f_ecif = open(os.path.join(tmpdata_dir, 'ecif_data', 'ECIF_{}.csv'.format(d)), 'a', newline='')
+            f_elements = open(os.path.join(tmpdata_dir, 'ecif_data', 'ELEMENTS_{}.csv'.format(d)), 'a', newline='')
         # write csv headers
         possible_ecif = helper.get_possible_ecif()
         possible_elements = helper.get_possible_elements()
@@ -71,21 +103,36 @@ def collect_ecif(distance_cutoffs):
                 ecif_writer.writerow([id] + ecif_list)
                 elements_writer.writerow([id] + elements_list)
                 continue
+            not_listed_ids.add(id)
         f_ecif.close()
         f_elements.close()
 
     print("\n- Finished -\n")
+    if len(not_listed_ids) > 0:
+        print("Following IDs not listed in ECIF:\n")
+        print(not_listed_ids)
+        print("\n")
 
 
-def collect_ld():
-    ecif_dict = get_ecif_dict()
-    ecif_ids = ecif_dict.keys()
+def collect_ld(indices=None, tag=None):
+    """
+
+    :param indices:
+    :param tag:
+    :return:
+    """
+    if indices is not None:
+        ecif_ids = indices
+    else:
+        ecif_dict = get_ecif_dict()
+        ecif_ids = ecif_dict.keys()
     ecif_core_ids = IndexMng.get_index_from_dir(ecif_core)
     ecif_2016_refined_ids = IndexMng.get_index_from_dir(ecif_2016_refined)
     ecif_2019_refined_ids = IndexMng.get_index_from_dir(ecif_2019_refined)
     ecif_2019_general_minus_refined_ids = IndexMng.get_index_from_dir(ecif_2019_general_minus_refined)
     helper = ECIF(2016)
     lid_fts = {}
+    not_listed_ids = set()
     print("\nCollecting Ligand Descriptors: \n")
     for id in tqdm(ecif_ids):
         if id in ecif_core_ids:
@@ -96,21 +143,63 @@ def collect_ld():
             ligand_file = os.path.join(ecif_2019_general_minus_refined, id, "{}_ligand.sdf".format(id))
         elif id in ecif_2019_refined_ids:
             ligand_file = os.path.join(ecif_2019_refined, id, "{}_ligand.sdf".format(id))
+        else:
+            not_listed_ids.add(id)
+            continue
         if id not in lid_fts.keys():
             lid_fts[id] = helper.get_ligand_features_by_file(ligand_file)
-    f_ld = open(os.path.join(tmpdata_dir, 'ecif_data', 'RDKit_Descriptors.csv'), 'a', newline='')
+    if tag is not None:
+        f_ld = open(os.path.join(tmpdata_dir, 'ecif_data', 'RDKit_Descriptors_{}.csv'.format(tag)), 'a', newline='')
+    else:
+        f_ld = open(os.path.join(tmpdata_dir, 'ecif_data', 'RDKit_Descriptors.csv'), 'a', newline='')
     # write csv header
     ld_header = ['PDB'] + helper.get_ligand_descriptors()
     ld_writer = csv.writer(f_ld)
     ld_writer.writerow(ld_header)
     for id in ecif_ids:
-        lid_ft = [id] + list(lid_fts[id])
-        ld_writer.writerow(lid_ft)
+        if id not in not_listed_ids:
+            lid_ft = [id] + list(lid_fts[id])
+            ld_writer.writerow(lid_ft)
     f_ld.close()
     print("\n- Finished -\n")
+    if len(not_listed_ids) > 0:
+        print("Following IDs not listed in ECIF:\n")
+        print(not_listed_ids)
+        print("\n")
 
 
-def my_test():
+def query_pk_by_id(qid):
+    return float(affinity_data[affinity_data['pdbid'] == qid]['-logKd/Ki'])
+
+
+def write_binding_data(tag, train_num):
+    """
+    for extra experiments, new BindingData.csv that associates with new fingerprint file and ligand descriptor file is needed
+    :param tag: tag is needed
+    :param train_num: size of train set, if not given, all data are labeled as 'Train'
+    :return:
+    """
+    if tag is not None:
+        ecif_data = pd.read_csv(os.path.join(tmpdata_dir, 'ecif_data', 'ECIF_6.0_{}.csv'.format(tag)), comment='#')
+        f_bd = open("../Preprocess/BindingData_{}.csv".format(tag), 'a', newline='')
+    else:
+        ecif_data = pd.read_csv(os.path.join(tmpdata_dir, 'ecif_data', 'ECIF_6.0.csv'.format(tag)), comment='#')
+        f_bd = open("../Preprocess/BindingData.csv".format(tag), 'a', newline='')
+    bd_writer = csv.writer(f_bd)
+    headers = ['PDB', 'SET', 'pK']
+    bd_writer.writerow(headers)
+    count = train_num if train_num is not None else len(ecif_data['PDB'])
+    for id in ecif_data['PDB']:
+        count -= 1
+        # omotcha: this extra experiment assumes no split on dataset, and use auto test/train split when training
+        if count >= 0:
+            bd_writer.writerow([id, 'Train', query_pk_by_id(id)])
+        else:
+            bd_writer.writerow([id, 'Test', query_pk_by_id(id)])
+    f_bd.close()
+
+
+def helper_get_test():
     distance_cutoffs = '6.0'
     helper = ECIF(2016)
     protein_file = os.path.join(tmpdata_dir, "1a0q_protein.pdb")
@@ -133,9 +222,16 @@ def all_cutoff_collecting():
     collect_ld()
 
 
-def test():
-    my_test()
+def best_cutoff_collecting_ign():
+    ids = get_all_ign_index()
+    collect_ecif(['6.0'], indices=ids, tag='ign')
+    collect_ld(indices=ids, tag='ign')
+
+
+def my_test():
+    write_binding_data('ign', train_num=8041)
+    # best_cutoff_collecting_ign()
 
 
 if __name__ == '__main__':
-    best_cutoff_collecting()
+    my_test()

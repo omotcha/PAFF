@@ -18,19 +18,25 @@ def get_ecif_dict():
     return ret
 
 
-def train_with_autogluon(distance_cutoffs, split_factor):
+def train_with_autogluon(distance_cutoffs, split_factor, tag):
     """
     training tabular data (like ECIF_6.0.csv) using autogluon
     :param distance_cutoffs:
     :param split_factor: size(test) / size(test+train),
                          if split_factor not given, you should split it yourself
+    :param tag
     :return:
     """
     for d in distance_cutoffs:
         print("\n")
-        ecif = TabularDataset(os.path.join(tmpdata_dir, 'ecif_data', 'ECIF_{}.csv'.format(d)))
-        ligand_descriptors = TabularDataset(os.path.join(tmpdata_dir, 'ecif_data', 'RDKit_Descriptors.csv'))
-        binding_data = TabularDataset("../Preprocess/BindingData.csv")
+        if tag is not None:
+            ecif = TabularDataset(os.path.join(tmpdata_dir, 'ecif_data', 'ECIF_{}_{}.csv'.format(d, tag)))
+            ligand_descriptors = TabularDataset(os.path.join(tmpdata_dir, 'ecif_data', 'RDKit_Descriptors_{}.csv'.format(tag)))
+            binding_data = TabularDataset("../Preprocess/BindingData_{}.csv".format(tag))
+        else:
+            ecif = TabularDataset(os.path.join(tmpdata_dir, 'ecif_data', 'ECIF_{}.csv'.format(d)))
+            ligand_descriptors = TabularDataset(os.path.join(tmpdata_dir, 'ecif_data', 'RDKit_Descriptors.csv'))
+            binding_data = TabularDataset("../Preprocess/BindingData.csv")
         # Merge descriptors
         ecif = ecif.merge(ligand_descriptors, left_on="PDB", right_on="PDB")
         ecif = ecif.merge(binding_data, left_on="PDB", right_on="PDB")
@@ -113,14 +119,15 @@ def predict_with_autogluon_by_id(ids, d, model_dir, select_model=None):
 
 
 def exp_step_1():
-    train_with_autogluon(['6.0'], split_factor=False)
+    train_with_autogluon(['6.0'], split_factor=None, tag='ign')
 
 
 def exp_step_2():
     predict_with_autogluon_by_id(
-        ids=['1a1b', '1a30'],
+        ids=['1a1b', '1a0q', '1a1c', '1a3e', '1a4h'],
         d='6.0',
-        model_dir=os.path.join(autogluon_model_dir, 'ag-20220629_071709'),
+        # model_dir=os.path.join(autogluon_model_dir, 'ag-20220629_071709'),
+        model_dir=os.path.join(autogluon_model_dir, 'ag-20220630_033921'),
         select_model=False)
 
 
