@@ -35,3 +35,7 @@ ecif_example = os.path.join(autogluon_model_dir, "ag-20220629_084956\\models\\Li
 # for IGN
 ign_index_dir = os.path.join(tmpdata_dir, 'ign_index')
 core2013_dir = os.path.join(datasets_dir, "pdbbind2013\\coreset")
+
+# for extra experiments using pdbbind2020
+extra_2020_base = os.path.join(datasets_dir, "pdbbind2020")
+extra_2020_index = os.path.join(extra_2020_base, "index")

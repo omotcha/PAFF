@@ -1,47 +1,33 @@
+"""
+
+    Pafnucy data preparation
+
+"""
 import numpy as np
 import pandas as pd
 import h5py
-import os
 import re
-import csv
 from tqdm import tqdm
-import matplotlib.pyplot as plt
 from config import *
 from openbabel import pybel
 from tfbioSupport.tfbio.data import Featurizer
+from util.affinityDataMng import AffinityDataMngr
+
 
 import warnings
 
 import seaborn as sns
 
 # omotcha: base dir of dataset on Windows
-dataset_dir = 'D:\\AlexYu\\datasets\\dataset\\pdbbind2016'
-dataset2013_dir = 'D:\\AlexYu\\datasets\\dataset\\pdbbind2013'
-
-
-def get_aff_data():
-    general_index = os.path.join(dataset_dir,
-                                 'PDBbind_2016_plain_text_index', 'index', 'INDEX_general_PL_data.2016')
-
-    aff_data = []
-    with open(general_index, "r") as f:
-        lines = f.readlines()
-        for line in lines:
-            seg = re.split(' +', line)
-            if seg[0] != '#':
-                aff_data.append([seg[0], seg[3]])
-    return aff_data
-
-
-def write_aff_data():
-    with open(os.path.join(tmpdata_dir, 'affinity_data_1.csv'), "w") as f:
-        f.write('pdbid,-logKd/Ki\n')
-        for aff in get_aff_data():
-            f.write('{},{}\n'.format(aff[0], aff[1]))
+dataset_dir = base_dir
+dataset2013_dir = os.path.join(datasets_dir, "pdbbind2013")
 
 
 def get_missing():
-    aff_data = get_aff_data()
+    aff_mngr = AffinityDataMngr(
+        os.path.join(project_dir, "tmpdata"),
+        os.path.join(base_dir, "PDBbind_2016_plain_text_index\\index\\INDEX_general_PL_data.2020"))
+    aff_data = aff_mngr.get_aff_data()
     # omotcha: this aff_data should be initialized first by get_affinity_data
     exclusion_dir = os.path.join(dataset_dir,
                                  'general-set-except-refined')
@@ -247,7 +233,10 @@ def write_protein_data():
 
 
 def exp_steps_1():
-    write_aff_data()
+    aff_mngr = AffinityDataMngr(
+        os.path.join(project_dir, "tmpdata"),
+        os.path.join(base_dir, "PDBbind_2016_plain_text_index\\index\\INDEX_general_PL_data.2020"))
+    aff_mngr.write_aff_data("affinity_data_1.csv")
 
 
 def exp_steps_2():
