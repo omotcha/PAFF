@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 from config import *
-from predict import ecif_predict
 from DatasetMng.IndexMng import get_index_from_dir
 import matplotlib.pyplot as plt
 import pickle
@@ -74,10 +73,84 @@ def predict_on_core_ag(model):
     plt.show()
 
 
+def predict_ex(f_pro, f_lig, d):
+    """
+    predict on protein-ligand pairs not in core set
+    :param f_pro: protein file, .pdb
+    :param f_lig: ligand file, .sdf
+    :param d: using cutoff distance
+    :return:
+    """
+    from util.ECIF import ECIF
+    ecif_helper = ECIF(2016)
+    ecif = ecif_helper.get_ecif(f_pro, f_lig, float(d))
+    ld = ecif_helper.get_ligand_features_by_file(f_lig)
+    model = pickle.load(open(os.path.join(ecif_model_dir, 'ecif_gbt_{}.pkl'.format(d)), 'rb'))
+    data = ecif + list(ld)
+    cols = ecif_helper.get_possible_ecif() + ecif_helper.get_ligand_descriptors()
+    data_f = pd.DataFrame([data], columns=cols)
+    return model.predict(data_f)[0]
+
+
+def predict_ex_ag(f_pro, f_lig, model):
+    """
+    predict on protein-ligand pairs not in core set
+    :param f_pro: protein file, .pdb
+    :param f_lig: ligand file, .sdf
+    :param model:
+    :return:
+    """
+    from util.ECIF import ECIF
+    ecif_helper = ECIF(2016)
+    ecif = ecif_helper.get_ecif(f_pro, f_lig, float(6.0))
+    ld = ecif_helper.get_ligand_features_by_file(f_lig)
+    m = pickle.load(open(model, 'rb'))
+    data = ecif + list(ld)
+    cols = ecif_helper.get_possible_ecif() + ecif_helper.get_ligand_descriptors()
+    data_f = pd.DataFrame([data], columns=cols)
+    return m.predict(data_f)[0]
+
+
 def my_test():
     predict_on_core('6.0')
-    predict_on_core_ag(ecif_example)
+    # predict_on_core_ag(ecif_example)
+
+
+def estim_ext(ids, d):
+    actual = []
+    predicted = []
+    model = pickle.load(open(os.path.join(ecif_model_dir, 'ecif_gbt_{}.pkl'.format(d)), 'rb'))
+    for id in ids:
+        actual.append(query_pk_by_id(id))
+        predicted.append(model.predict(query_described_value(id))[0])
+    print("\n")
+    print("pred:")
+    print(predicted)
+    print("actual:")
+    print(actual)
+
+
+def estim_not_ext():
+    print("\n")
+    ids = ['6V1J', '6V1M', '6V1O']
+    preds = []
+    preds_ag = []
+    for i in ids:
+        f_prot = "C:\\Users\\user\\Desktop\\bak\\{}\\{}_protein.pdb".format(i, i)
+        f_ligd = "C:\\Users\\user\\Desktop\\bak\\{}\\{}_ligand.sdf".format(i, i)
+        preds.append(predict_ex(f_prot, f_ligd, '6.0'))
+        preds_ag.append(predict_ex_ag(f_prot, f_ligd, ecif_example))
+
+    print("\n")
+    print(preds)
+    print(preds_ag)
+    for p in preds:
+        print(10**(-p))
 
 
 if __name__ == '__main__':
-    my_test()
+    print("\nnot existing")
+    estim_not_ext()
+    print("\nexisting")
+    estim_ext(['2j4i', '2p4y'], '6.0')
+    # my_test()

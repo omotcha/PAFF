@@ -1,10 +1,7 @@
 import pandas as pd
-import os
 from config import *
-import sklearn.tree
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.ensemble import GradientBoostingRegressor
-from sklearn.ensemble import AdaBoostRegressor
 from sklearn.metrics import mean_squared_error
 from scipy.stats import pearsonr
 from math import sqrt
@@ -50,10 +47,6 @@ def train(distance_cutoffs, save_model=True):
             pickle.dump(GBT, open(os.path.join(ecif_model_dir, 'ecif_gbt_{}.pkl'.format(d)), 'wb'))
 
         print("\n - finished -\n")
-
-
-# def test():
-#     train(['6.0'], False)
 
 
 if __name__ == '__main__':

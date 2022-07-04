@@ -1,6 +1,9 @@
+import pandas as pd
+
 from config import *
 import os
 import re
+from DatasetMng.coreIndexMng import get_core_ids
 
 
 class AffinityDataMngr:
@@ -56,15 +59,46 @@ class AffinityDataMngr:
             self._aff_data_loc = tmpdata_dir
         else:
             self._aff_data_loc = aff_loc
+
         self._get_aff_data_from_index_file(src)
 
 
-def test():
+class BindingDataMngr:
+    _bd_data_loc = ""
+    _train_loc = ""
+    _valid_loc = ""
+
+    def __init__(self, bd_loc, train_loc, valid_loc):
+        if bd_loc is None:
+            self._bd_data_loc = preprocess_dir
+        else:
+            self._bd_data_loc = bd_loc
+        if train_loc is None:
+            self._train_loc = refined_dir
+        else:
+            self._train_loc = train_loc
+        if valid_loc is None:
+            self._valid_loc = core_dir
+        else:
+            self._valid_loc = valid_loc
+
+
+def create_aff_2020():
     aff_mngr = AffinityDataMngr(
         os.path.join(project_dir, "affdata"),
         os.path.join(extra_2020_index, "INDEX_general_PL_data.2020"))
     aff_mngr.write_aff_data("affinity_data_2020.csv")
 
 
+def test_core2016_included_in_aff2020():
+    core_ids = get_core_ids()
+    aff_data = pd.read_csv(os.path.join(project_dir, "affdata", "affinity_data_2020.csv"))
+    core_dict = {}
+    for cid in core_ids:
+        aff = aff_data[aff_data['pdbid'] == cid].iloc[0].tolist()
+        core_dict[aff[0]] = aff[1]
+    print(len(core_dict.keys()))
+
+
 if __name__ == '__main__':
-    test()
+    test_core2016_included_in_aff2020()

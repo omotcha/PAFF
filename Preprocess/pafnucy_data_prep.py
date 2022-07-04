@@ -26,7 +26,7 @@ dataset2013_dir = os.path.join(datasets_dir, "pdbbind2013")
 def get_missing():
     aff_mngr = AffinityDataMngr(
         os.path.join(project_dir, "tmpdata"),
-        os.path.join(base_dir, "PDBbind_2016_plain_text_index\\index\\INDEX_general_PL_data.2020"))
+        os.path.join(base_dir, "PDBbind_2016_plain_text_index\\index\\INDEX_general_PL_data.2016"))
     aff_data = aff_mngr.get_aff_data()
     # omotcha: this aff_data should be initialized first by get_affinity_data
     exclusion_dir = os.path.join(dataset_dir,
@@ -235,7 +235,7 @@ def write_protein_data():
 def exp_steps_1():
     aff_mngr = AffinityDataMngr(
         os.path.join(project_dir, "tmpdata"),
-        os.path.join(base_dir, "PDBbind_2016_plain_text_index\\index\\INDEX_general_PL_data.2020"))
+        os.path.join(base_dir, "PDBbind_2016_plain_text_index\\index\\INDEX_general_PL_data.2016"))
     aff_mngr.write_aff_data("affinity_data_1.csv")
 
 

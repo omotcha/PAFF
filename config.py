@@ -13,6 +13,7 @@ datasets_dir = "D:\\AlexYu\\datasets\\dataset"
 
 tmpdata_dir = os.path.join(project_dir, "tmpdata")
 util_dir = os.path.join(project_dir, "util")
+preprocess_dir = os.path.join(project_dir, "Preprocess")
 
 # base dataset(or for pafnucy): PDBBind 2016
 base_dir = os.path.join(datasets_dir, "pdbbind2016")
@@ -21,10 +22,10 @@ core_dir = os.path.join(base_dir, "coreset")
 general_except_core_dir = os.path.join(base_dir, "general-set-except-refined")
 
 # for ECIF
-ecif_2016_refined = os.path.join(datasets_dir, "pdbbind2016\\refined-set")
+ecif_2016_refined = refined_dir
 ecif_2019_refined = os.path.join(datasets_dir, "pdbbind2019\\refined-set")
 ecif_2019_general_minus_refined = os.path.join(datasets_dir, "pdbbind2019\\general-minus-refined")
-ecif_core = os.path.join(datasets_dir, "pdbbind2016\\coreset")
+ecif_core = core_dir
 ecif_model_dir = os.path.join(project_dir, 'model', 'ecif')
 ecif_data_dir = os.path.join(tmpdata_dir, 'ecif_data')
 
@@ -39,3 +40,5 @@ core2013_dir = os.path.join(datasets_dir, "pdbbind2013\\coreset")
 # for extra experiments using pdbbind2020
 extra_2020_base = os.path.join(datasets_dir, "pdbbind2020")
 extra_2020_index = os.path.join(extra_2020_base, "index")
+extra_2020_refined = os.path.join(extra_2020_base, "refined-set")
+extra_2020_general_minus_refined = os.path.join(extra_2020_base, "v2020-other-PL")

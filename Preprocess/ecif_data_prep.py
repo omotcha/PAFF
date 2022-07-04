@@ -7,7 +7,7 @@ from DatasetMng import IndexMng
 from util.ECIF import *
 from tqdm import tqdm
 
-# make sure affinity data exists in /tmpdata, it can be created by pafnucy_data_prep
+# make sure affinity data exists, it can be created by util/affinityDataMng
 affinity_data = pd.read_csv(os.path.join(tmpdata_dir, 'affinity_data_1.csv'), comment='#')
 
 
@@ -22,6 +22,10 @@ def get_ecif_dict():
 
 
 def get_all_ign_index():
+    """
+    ign index folder has 3 index text files, named (valid|train|test).index.txt, containing all the protein indices
+    :return:
+    """
     with open(os.path.join(ign_index_dir, 'train.index.txt'), 'r') as ftr:
         tr = [i[0:4] for i in ftr.readlines()]
     with open(os.path.join(ign_index_dir, 'test.index.txt'), 'r') as fte:
@@ -134,92 +138,8 @@ def collect_ecif(distance_cutoffs, indices=None, tag=None):
         print("\n")
 
 
-def collect_ecif_test(distance_cutoffs, indices=None, tag=None):
-    """
-    collect ECIF and ELEMENTS data from pdb files and sdf files
-    :param distance_cutoffs:
-    :param indices: given ids for extra experiments,
-                    note that currently this set of index should be subset of that of ECIF,
-                    otherwise the not-included part would not be collected
-    :param tag:     for extra experiments, to make a distinction between files created by ECIF
-    :return:
-    """
-    if indices is not None:
-        ecif_ids = indices
-    else:
-        ecif_dict = get_ecif_dict()
-        ecif_ids = ecif_dict.keys()
-    ecif_core_ids = IndexMng.get_index_from_dir(ecif_core)
-    ecif_2016_refined_ids = IndexMng.get_index_from_dir(ecif_2016_refined)
-    ecif_2019_refined_ids = IndexMng.get_index_from_dir(ecif_2019_refined)
-    ecif_2019_general_minus_refined_ids = IndexMng.get_index_from_dir(ecif_2019_general_minus_refined)
-
-    helper = ECIF(2016)
-    print("\nCollecting ECIF and ELEMENTS data: ")
-    not_listed_ids = set()
-    for d in distance_cutoffs:
-        print("\n distance_cutoff: {}\n".format(d))
-        if tag is not None:
-            f_ecif = open(os.path.join(tmpdata_dir, 'ecif_data', 'ECIF_{}_{}.csv'.format(d, tag)), 'a', newline='')
-            f_elements = open(os.path.join(tmpdata_dir, 'ecif_data', 'ELEMENTS_{}_{}.csv'.format(d, tag)), 'a', newline='')
-        else:
-            f_ecif = open(os.path.join(tmpdata_dir, 'ecif_data', 'ECIF_{}.csv'.format(d)), 'a', newline='')
-            f_elements = open(os.path.join(tmpdata_dir, 'ecif_data', 'ELEMENTS_{}.csv'.format(d)), 'a', newline='')
-        # write csv headers
-        possible_ecif = helper.get_possible_ecif()
-        possible_elements = helper.get_possible_elements()
-        ecif_header = ['PDB'] + possible_ecif
-        elements_header = ['PDB'] + possible_elements
-        ecif_writer = csv.writer(f_ecif)
-        elements_writer = csv.writer(f_elements)
-        ecif_writer.writerow(ecif_header)
-        elements_writer.writerow(elements_header)
-        for id in tqdm(ecif_ids):
-            if not len(id) == 4:
-                print(id)
-                continue
-
-            if id in ecif_core_ids:
-                protein_file = os.path.join(ecif_core, id, "{}_protein.pdb".format(id))
-                ligand_file = os.path.join(ecif_core, id, "{}_ligand.sdf".format(id))
-                ecif_list = helper.get_ecif(protein_file, ligand_file, float(d))
-                elements_list = helper.get_elements(protein_file, ligand_file, float(d))
-                ecif_writer.writerow([id] + ecif_list)
-                elements_writer.writerow([id] + elements_list)
-                continue
-            if id in ecif_2016_refined_ids:
-                protein_file = os.path.join(ecif_2016_refined, id, "{}_protein.pdb".format(id))
-                ligand_file = os.path.join(ecif_2016_refined, id, "{}_ligand.sdf".format(id))
-                ecif_list = helper.get_ecif(protein_file, ligand_file, float(d))
-                elements_list = helper.get_elements(protein_file, ligand_file, float(d))
-                ecif_writer.writerow([id] + ecif_list)
-                elements_writer.writerow([id] + elements_list)
-                continue
-            if id in ecif_2019_refined_ids:
-                protein_file = os.path.join(ecif_2019_refined, id, "{}_protein.pdb".format(id))
-                ligand_file = os.path.join(ecif_2019_refined, id, "{}_ligand.sdf".format(id))
-                ecif_list = helper.get_ecif(protein_file, ligand_file, float(d))
-                elements_list = helper.get_elements(protein_file, ligand_file, float(d))
-                ecif_writer.writerow([id] + ecif_list)
-                elements_writer.writerow([id] + elements_list)
-                continue
-            if id in ecif_2019_general_minus_refined_ids:
-                protein_file = os.path.join(ecif_2019_general_minus_refined, id, "{}_protein.pdb".format(id))
-                ligand_file = os.path.join(ecif_2019_general_minus_refined, id, "{}_ligand.sdf".format(id))
-                ecif_list = helper.get_ecif(protein_file, ligand_file, float(d))
-                elements_list = helper.get_elements(protein_file, ligand_file, float(d))
-                ecif_writer.writerow([id] + ecif_list)
-                elements_writer.writerow([id] + elements_list)
-                continue
-            not_listed_ids.add(id)
-        f_ecif.close()
-        f_elements.close()
-
-    print("\n- Finished -\n")
-    if len(not_listed_ids) > 0:
-        print("Following IDs not listed in ECIF:\n")
-        print(not_listed_ids)
-        print("\n")
+def collect_ecif_ex(distance_cutoffs, indices=None, tag=None):
+    pass
 
 
 def collect_ld(indices=None, tag=None):
@@ -339,7 +259,7 @@ def best_cutoff_collecting_ign(tag):
 def best_cutoff_collecting_ign_2013(tag):
     n_test = 95
     ids = get_all_ign_index_2013(n_test)
-    collect_ecif_test(['6.0'], indices=ids, tag=tag)
+    collect_ecif(['6.0'], indices=ids, tag=tag)
     collect_ld(indices=ids, tag=tag)
 
 
