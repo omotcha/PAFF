@@ -17,6 +17,7 @@
       <excludeFolder url="file://$MODULE_DIR$/train/.pytest_cache" />
       <excludeFolder url="file://$MODULE_DIR$/train/AutogluonModels" />
       <excludeFolder url="file://$MODULE_DIR$/util/.pytest_cache" />
+      <excludeFolder url="file://$MODULE_DIR$/analysis/.pytest_cache/v" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.9" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />

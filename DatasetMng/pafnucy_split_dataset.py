@@ -1,3 +1,8 @@
+"""
+
+    the step of splitting dataset is done separately here as a python script
+
+"""
 from sklearn.utils import shuffle
 from config import *
 import h5py
