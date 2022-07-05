@@ -10,8 +10,7 @@ from config import *
 import os
 
 name = sys.argv[-1]
-print(name)
-file_path = refined_dir
+file_path = "C:\\Users\\user\\Desktop\\bak\\bat\\"
 PDB_file = file_path + name + '\\' + name
 protein = chimera.openModels.open('%s_pocket.pdb' % PDB_file)
 """

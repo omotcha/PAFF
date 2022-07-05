@@ -132,7 +132,7 @@ def estim_ext(ids, d):
 
 def estim_not_ext():
     print("\n")
-    ids = ['6V1J', '6V1M', '6V1O']
+    ids = ['6rw2', '6rwj', '6s4b', '6s6k', '6sa3', '6sah', '6saj', '6sb8']
     preds = []
     preds_ag = []
     for i in ids:
@@ -151,6 +151,6 @@ def estim_not_ext():
 if __name__ == '__main__':
     print("\nnot existing")
     estim_not_ext()
-    print("\nexisting")
-    estim_ext(['2j4i', '2p4y'], '6.0')
+    # print("\nexisting")
+    # estim_ext(['2j4i', '2p4y'], '6.0')
     # my_test()
