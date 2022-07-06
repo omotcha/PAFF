@@ -20,6 +20,7 @@
       <excludeFolder url="file://$MODULE_DIR$/analysis/.pytest_cache/v" />
       <excludeFolder url="file://$MODULE_DIR$/affdata" />
       <excludeFolder url="file://$MODULE_DIR$/.pytest_cache/v" />
+      <excludeFolder url="file://$MODULE_DIR$/tests" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.9" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />

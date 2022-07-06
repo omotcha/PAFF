@@ -1,3 +1,5 @@
+import os
+
 import pandas as pd
 import numpy as np
 from config import *
@@ -130,27 +132,28 @@ def estim_ext(ids, d):
     print(actual)
 
 
-def estim_not_ext():
+def estim_not_ext(test_name):
     print("\n")
-    ids = ['6rw2', '6rwj', '6s4b', '6s6k', '6sa3', '6sah', '6saj', '6sb8']
+    ids = os.listdir(os.path.join(test_dir, test_name))
     preds = []
     preds_ag = []
     for i in ids:
-        f_prot = "C:\\Users\\user\\Desktop\\bak\\{}\\{}_protein.pdb".format(i, i)
-        f_ligd = "C:\\Users\\user\\Desktop\\bak\\{}\\{}_ligand.sdf".format(i, i)
-        preds.append(predict_ex(f_prot, f_ligd, '6.0'))
-        preds_ag.append(predict_ex_ag(f_prot, f_ligd, ecif_example))
+        f_prot = os.path.join(test_dir, test_name, "{}\\{}_protein.pdb".format(i, i))
+        f_ligd = os.path.join(test_dir, test_name, "{}\\{}_ligand.sdf".format(i, i))
+        pk = predict_ex(f_prot, f_ligd, '6.0')
+        preds.append(pk)
+        pk_ag = predict_ex_ag(f_prot, f_ligd, ecif_example)
+        preds_ag.append(pk_ag)
 
     print("\n")
-    print(preds)
-    print(preds_ag)
-    for p in preds:
-        print(10**(-p))
+    result = pd.DataFrame(preds, ids, columns=["GBT"])
+    result = result.join(
+        pd.DataFrame(preds_ag, ids, columns=["AG"])
+    )
+
+    print(result)
 
 
 if __name__ == '__main__':
-    print("\nnot existing")
-    estim_not_ext()
-    # print("\nexisting")
-    # estim_ext(['2j4i', '2p4y'], '6.0')
-    # my_test()
+    estim_not_ext("20220706")
+

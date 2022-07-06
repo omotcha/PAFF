@@ -14,6 +14,7 @@ datasets_dir = "D:\\AlexYu\\datasets\\dataset"
 tmpdata_dir = os.path.join(project_dir, "tmpdata")
 util_dir = os.path.join(project_dir, "util")
 preprocess_dir = os.path.join(project_dir, "Preprocess")
+test_dir = os.path.join(project_dir, "tests")
 
 # base dataset(or for pafnucy): PDBBind 2016
 base_dir = os.path.join(datasets_dir, "pdbbind2016")
