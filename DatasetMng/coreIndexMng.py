@@ -1,17 +1,21 @@
+"""
+platform: any
+env: any
+name: coreIndexMng.py
+Initially there is no index file in core set, so i have to create it.
+Suppose that the core set is a pure subset of refined set,
+then the index file of core set can be generated through that of refined set.
+"""
 import csv
 import os
 from config import *
 
-"""
-
-    Initially there is no index file in core set, so i have to create it.
-    Suppose that the core set is a pure subset of refined set, 
-    then the index file of core set can be generated through that of refined set.
-    
-"""
-
 
 def get_core_ids():
+    """
+    get indices of core set
+    :return:
+    """
     ids = []
     files = os.listdir(core_dir)
     for f in files:
@@ -20,6 +24,10 @@ def get_core_ids():
 
 
 def create_core_index():
+    """
+    if index file of core set not found, create it personally
+    :return:
+    """
     core_ids = get_core_ids()
     refined_index_dir = os.path.join(refined_dir, "index")
     refined_index_file = os.path.join(refined_index_dir, "INDEX_refined_data.2016")
