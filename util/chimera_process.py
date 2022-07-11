@@ -1,5 +1,7 @@
 """
-process.py
+platform: win
+env: chimera_env
+name: chimera_process.py
 """
 
 import chimera

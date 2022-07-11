@@ -1,3 +1,9 @@
+"""
+platform: win
+env: any
+name: train_ecif.py
+ECIF::GBT model training
+"""
 import pandas as pd
 from config import *
 from sklearn.ensemble import RandomForestRegressor
@@ -9,6 +15,12 @@ import pickle
 
 
 def train(distance_cutoffs, save_model=True):
+    """
+    ECIF::GBT model training
+    :param distance_cutoffs: list of distance cutoffs(in string), in terms of simplicity, by default it is ['6.0']
+    :param save_model: if generated model be saved, if true, model would be saved to model/ecif
+    :return:
+    """
     for d in distance_cutoffs:
         print("\n")
         ecif = pd.read_csv(os.path.join(tmpdata_dir, 'ecif_data', 'ECIF_{}.csv'.format(d)))

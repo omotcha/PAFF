@@ -1,3 +1,9 @@
+"""
+platform: any
+env: any
+name: affinityDataMng.py
+manage affinity data processing
+"""
 import pandas as pd
 
 from config import *
@@ -28,12 +34,17 @@ class AffinityDataMngr:
     # callables
 
     def get_pk_by_index(self, i):
+        """
+        get the pk value by query id
+        :param i: query id
+        :return: pk value
+        """
         return self._aff_data[i]
 
     def get_aff_data(self):
         """
         get affinity data stored by list
-        :return:
+        :return: list of affinity data
         """
         ret = []
         for k in self._aff_data.keys():
@@ -52,6 +63,10 @@ class AffinityDataMngr:
                 f.write('{},{}\n'.format(k, self._aff_data[k]))
 
     def testADM(self):
+        """
+        class test
+        :return:
+        """
         print(self._aff_data.values())
 
     def __init__(self, aff_loc, src):
@@ -84,6 +99,10 @@ class BindingDataMngr:
 
 
 def create_aff_2020():
+    """
+
+    :return:
+    """
     aff_mngr = AffinityDataMngr(
         os.path.join(project_dir, "affdata"),
         os.path.join(extra_2020_index, "INDEX_general_PL_data.2020"))
@@ -91,6 +110,10 @@ def create_aff_2020():
 
 
 def test_core2016_included_in_aff2020():
+    """
+
+    :return:
+    """
     core_ids = get_core_ids()
     aff_data = pd.read_csv(os.path.join(project_dir, "affdata", "affinity_data_2020.csv"))
     core_dict = {}

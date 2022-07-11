@@ -1,3 +1,9 @@
+"""
+platform: win
+env: any
+name: ECIF.py
+ECIF utils
+"""
 import numpy as np
 import pandas as pd
 import os
@@ -254,6 +260,10 @@ class ECIF:
 
 
 def my_test():
+    """
+    test
+    :return:
+    """
     ligand_file = os.path.join(tmpdata_dir, '1a0q_ligandCD1.sdf')
     protein_file = os.path.join(tmpdata_dir, '1a0q_protein.pdb')
     ecif_helper = ECIF(2016)

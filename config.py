@@ -1,3 +1,8 @@
+"""
+platform: win
+env: any
+name: config.py
+"""
 import os
 
 project_dir = "D:\\AlexYu\\PAFF"

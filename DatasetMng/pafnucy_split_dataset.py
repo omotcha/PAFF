@@ -1,7 +1,8 @@
 """
-
-    the step of splitting dataset is done separately here as a python script
-
+platform: win
+env: pafnucy_env
+name: pafnucy_split_dataset.py
+the step of splitting dataset is done separately here as a python script
 """
 from sklearn.utils import shuffle
 from config import *

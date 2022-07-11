@@ -151,7 +151,7 @@ def my_test():
 def estim_ext(ids, d):
     """
     for extra tests, do estimations on a list of proteins that are belongs to PDBBind dataset
-    :param ids: indices of proteins
+    :param ids: indexes of proteins
     :param d: cutoff distance, default 6.0
     :return: predictions
     """
@@ -198,5 +198,9 @@ def estim_not_ext(test_name):
 
 if __name__ == '__main__':
     # estim_not_ext("20220706")
-    my_test()
+    # my_test()
+    # estim_ext(['4djv', '4djy', '4djw', '4djx'], 6.0)
+    # estim_ext(['4gmy', '4gj2', '4hw2', '4hw3'], 6.0)
+    # estim_ext(['2zc9', '1h1s'], 6.0)
+    estim_not_ext("20220711")
 

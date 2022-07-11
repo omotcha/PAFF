@@ -1,26 +1,52 @@
+"""
+platform: win
+env: any
+name: check_dockprep.py
+"""
 import os
 from config import *
 
 
 def check_processed(fp):
+    """
+
+    :param fp:
+    :return:
+    """
     pdb_list = [k for k in os.listdir(fp)
                 if len(k) == 4 and os.path.isfile(fp + "%s\\%s_pocket.mol2" % (k, k))]
     return len(pdb_list)
 
 
 def check_not_preprocessed(fp):
+    """
+
+    :param fp:
+    :return:
+    """
     pdb_list = [k for k in os.listdir(fp)
                 if len(k) == 4 and not os.path.isfile(fp + "%s\\%s_pocket.mol2" % (k, k))]
     return len(pdb_list)
 
 
 def check_preprocessed(fp):
+    """
+
+    :param fp:
+    :return:
+    """
     print("checking {}".format(fp))
     print("{} processed".format(check_processed(fp)))
     print("{} not processed".format(check_not_preprocessed(fp)))
 
 
 def check_inclusion(cd, rd):
+    """
+
+    :param cd:
+    :param rd:
+    :return:
+    """
     core_list = [k for k in os.listdir(cd)
                  if len(k) == 4 and os.path.isfile(cd + "%s\\%s_pocket.mol2" % (k, k))]
     refined_list = [k for k in os.listdir(rd)

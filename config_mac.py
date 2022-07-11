@@ -1,3 +1,8 @@
+"""
+platform: macOS
+env: any
+name: config_mac.py
+"""
 import os
 from oddt import datasets
 

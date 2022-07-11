@@ -1,12 +1,26 @@
-# platform: win
-# env: base
-# error: command 'babel' not found in windows cli
+"""
+platform: win
+env: base
+name: mol2sdf.py
+error: command 'babel' not found in windows cli
+"""
 import multiprocessing
 from config import *
 
 
 def batchproc(f):
+    """
+
+    :param f:
+    :return:
+    """
     def mol2tosdf(path, file):
+        """
+
+        :param path:
+        :param file:
+        :return:
+        """
         try:
             sdf_file = os.path.join(path, file.split('\\')[-1].replace('.mol2', '.sdf'))
             cmdline = "babel -imol2 {} -osdf {} -h".format(file, sdf_file)

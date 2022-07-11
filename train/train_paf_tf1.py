@@ -1,7 +1,8 @@
 """
-
+platform: windows
+env: pafnucy_env
+name: train_paf_tf1.py
 pafnucy training using tf1 framework, tested but not trained on windows CPU, just for semantic suggestion
-
 """
 import numpy as np
 import pandas as pd
@@ -30,7 +31,11 @@ datasets = ['training', 'validation', 'test']
 
 
 def input_dir(path):
-    """Check if input directory exists and contains all needed files"""
+    """
+    Check if input directory exists and contains all needed files
+    :param path:
+    :return:
+    """
     global datasets
 
     path = os.path.abspath(path)
@@ -142,6 +147,13 @@ print('use sd as scaling factor')
 
 
 def get_batch(dataset_name, indices, rotation=0):
+    """
+
+    :param dataset_name:
+    :param indices:
+    :param rotation:
+    :return:
+    """
     global coords, features, std
     x = []
     for i, idx in enumerate(indices):
@@ -242,7 +254,11 @@ with graph.as_default():
 
 
 def batches(set_name):
-    """Batch generator, yields slice indices"""
+    """
+    Batch generator, yields slice indices
+    :param set_name:
+    :return:
+    """
     global num_batches, args, ds_sizes
     for b in range(num_batches[set_name]):
         bi = b * args.batch_size

@@ -1,5 +1,7 @@
 """
-run.py
+platform: win
+env: chimera_env
+name: chimera_run.py
 """
 import os
 from config import *

@@ -13,7 +13,7 @@ from config import *
 
 def get_core_ids():
     """
-    get indices of core set
+    get indexes of core set
     :return:
     """
     ids = []
