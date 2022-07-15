@@ -25,7 +25,7 @@ test_dir = os.path.join(project_dir, "tests")
 base_dir = os.path.join(datasets_dir, "pdbbind2016")
 refined_dir = os.path.join(base_dir, "refined-set")
 core_dir = os.path.join(base_dir, "coreset")
-general_except_core_dir = os.path.join(base_dir, "general-set-except-refined")
+general_except_refined_dir = os.path.join(base_dir, "general-set-except-refined")
 
 # for ECIF
 ecif_2016_refined = refined_dir

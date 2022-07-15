@@ -60,4 +60,4 @@ def check_inclusion(cd, rd):
 if __name__ == '__main__':
     # check_preprocessed(general_minus_refined_dir)
     # check_inclusion(core_dir, refined_dir)
-    print(check_not_preprocessed(general_except_core_dir))
+    print(check_not_preprocessed(general_except_refined_dir))

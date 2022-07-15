@@ -35,5 +35,5 @@ def remove_not_preprocessed_dir(fp):
 
 
 if __name__ == '__main__':
-    data_dir = general_except_core_dir
+    data_dir = general_except_refined_dir
     # remove_not_preprocessed_dir(data_dir)
