@@ -9,6 +9,7 @@ import os
 from config import *
 from DatasetMng.IndexMng import get_index_from_file
 from rdkit import Chem
+from rdkit.Chem import *
 import pickle
 
 sub_sets = ['test', 'train', 'valid']
@@ -29,11 +30,11 @@ def get_protein_file_by_id(i):
     print("warning index: {} not found".format(i))
 
 
-def get_ligand_file_by_id(i):
+def get_ligand_sdf_by_id(i):
     """
     all ligands needed are included in pdbbind 2016, either in core or in refined or in general-minus-refined
     :param i: ligand ID
-    :return: ligand file dir
+    :return: ligand sdf file dir
     """
     if i in os.listdir(core_dir):
         return os.path.join(core_dir, i, "{}_ligand.sdf".format(i))
@@ -41,6 +42,21 @@ def get_ligand_file_by_id(i):
         return os.path.join(refined_dir, i, "{}_ligand.sdf".format(i))
     if i in os.listdir(general_except_refined_dir):
         return os.path.join(general_except_refined_dir, i, "{}_ligand.sdf".format(i))
+    print("warning index: {} not found".format(i))
+
+
+def get_ligand_mol2_by_id(i):
+    """
+    all ligands needed are included in pdbbind 2016, either in core or in refined or in general-minus-refined
+    :param i: ligand ID
+    :return: ligand mol2 file dir
+    """
+    if i in os.listdir(core_dir):
+        return os.path.join(core_dir, i, "{}_ligand.mol2".format(i))
+    if i in os.listdir(refined_dir):
+        return os.path.join(refined_dir, i, "{}_ligand.mol2".format(i))
+    if i in os.listdir(general_except_refined_dir):
+        return os.path.join(general_except_refined_dir, i, "{}_ligand.mol2".format(i))
     print("warning index: {} not found".format(i))
 
 
@@ -62,7 +78,7 @@ def prepare_scripts(i, input_base, output_base):
     :return:
     """
     protein_file = get_protein_file_by_id(i)
-    ligand_file = get_ligand_file_by_id(i)
+    ligand_file = get_ligand_sdf_by_id(i)
     pocket_file = os.path.join(output_base, "pockets", "{}_pocket.pdb".format(i))
     script_file = os.path.join(output_base, "scripts", "{}_script.py".format(i))
     script_content = "from chimera import runCommand \n"
@@ -86,26 +102,24 @@ def prepare_single_complex_from_pocket_by_index(i, input_base, output_base):
     :param output_base: generated complex
     :return:
     """
-    ligand_file = get_ligand_file_by_id(i)
+    ligand_file = get_ligand_mol2_by_id(i)
     pocket_file = os.path.join(output_base, "pockets", "{}_pocket.pdb".format(i))
     try:
-        ligand = Chem.MolFromMolFile(ligand_file)
         pocket = Chem.MolFromPDBFile(pocket_file)
-        complex_file = os.path.join(output_base, "complexes", i)
-        with open(complex_file, 'wb') as f:
-            pickle.dump([ligand, pocket], f)
+        ligand = Chem.MolFromMol2File(ligand_file)
+        if ligand is None:
+            suppl_file = get_ligand_sdf_by_id(i)
+            suppl = Chem.SDMolSupplier(suppl_file)
+            smiles = [Chem.MolToSmiles(mol) for mol in suppl if mol]
+            if len(smiles) != 0:
+                ligand = Chem.MolFromSmiles(smiles[0])
+        if ligand is not None:
+            complex_file = os.path.join(output_base, "complexes", i)
+            with open(complex_file, 'wb') as f:
+                pickle.dump([ligand, pocket], f)
+
     except:
         print("complex {} generation failed...".format(i))
-
-
-def prepare_scripts_dir(input_base, output_base):
-    for name in os.listdir(input_base):
-        prepare_scripts(name, input_base=input_base, output_base=output_base)
-
-
-def prepare_single_complex_from_pocket_by_index_dir(input_base, output_base):
-    for name in os.listdir(input_base):
-        prepare_single_complex_from_pocket_by_index(name, input_base=input_base, output_base=output_base)
 
 
 def prepare_scripts_ign():
@@ -114,14 +128,14 @@ def prepare_scripts_ign():
     :return:
     """
     print('\n')
-    ibase = os.path.join(base_dir, "coreset")
     obase = os.path.join(base_dir, "example")
-    for name in os.listdir(ibase):
-        prepare_scripts(name, input_base=ibase, output_base=obase)
+    # ibase = os.path.join(base_dir, "coreset")
+    # for name in os.listdir(ibase):
+    #     prepare_scripts(name, input_base=ibase, output_base=obase)
 
-    ibase = os.path.join(base_dir, "refined-set")
-    for name in os.listdir(ibase):
-        prepare_scripts(name, input_base=ibase, output_base=obase)
+    # ibase = os.path.join(base_dir, "refined-set")
+    # for name in os.listdir(ibase):
+    #     prepare_scripts(name, input_base=ibase, output_base=obase)
 
     ibase = os.path.join(base_dir, "general-set-except-refined")
     for name in os.listdir(ibase):
@@ -134,22 +148,23 @@ def prepare_single_complex_ign():
     :return:
     """
     print('\n')
-    ibase = os.path.join(base_dir, "coreset")
     obase = os.path.join(base_dir, "example")
-    for name in os.listdir(ibase):
-        prepare_single_complex_from_pocket_by_index(name, input_base=ibase, output_base=obase)
+    # ibase = os.path.join(base_dir, "coreset")
+    # for name in os.listdir(ibase):
+    #     prepare_single_complex_from_pocket_by_index(name, input_base=ibase, output_base=obase)
 
-    ibase = os.path.join(base_dir, "refined-set")
-    for name in os.listdir(ibase):
-        prepare_single_complex_from_pocket_by_index(name, input_base=ibase, output_base=obase)
-
+    # ibase = os.path.join(base_dir, "refined-set")
+    # for name in os.listdir(ibase):
+    #     prepare_single_complex_from_pocket_by_index(name, input_base=ibase, output_base=obase)
+    #
     ibase = os.path.join(base_dir, "general-set-except-refined")
     for name in os.listdir(ibase):
         prepare_single_complex_from_pocket_by_index(name, input_base=ibase, output_base=obase)
 
 
 def test():
-    prepare_scripts_ign()
+    # prepare_scripts_ign()
+    prepare_single_complex_ign()
 
 
 if __name__ == '__main__':
