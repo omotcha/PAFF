@@ -6,11 +6,11 @@ name: config.py
 import os
 
 project_dir = "D:\\AlexYu\\PAFF"
-datasets_dir = "D:\\AlexYu\\datasets\\dataset"
+datasets_dir = "E:\\datasets\\dataset"
 
 """
     dataset arrangement:    <datasets_dir> => {folder: pdbbind20xx}
-                            <pdbbind20xx> => {folder:   "coreset", 
+                            <pdbbind20xx> => {folder:   "coreset"(optional), 
                                                         "refined-set", 
                                                         "general-minus-refined" | "general-set-except-refined"}
 """
@@ -34,6 +34,12 @@ ecif_2019_general_minus_refined = os.path.join(datasets_dir, "pdbbind2019\\gener
 ecif_core = core_dir
 ecif_model_dir = os.path.join(project_dir, 'model', 'ecif')
 ecif_data_dir = os.path.join(tmpdata_dir, 'ecif_data')
+
+# for ECIF+
+ecifp_base = os.path.join(datasets_dir, "pdbbind2020")
+ecifp_refined = os.path.join(ecifp_base, "refined-set")
+ecifp_general_minus_refined = os.path.join(ecifp_base, "general-minus-refined")
+ecifp_core = core_dir
 
 # for autogluon
 autogluon_model_dir = os.path.join(project_dir, 'train', 'AutogluonModels')

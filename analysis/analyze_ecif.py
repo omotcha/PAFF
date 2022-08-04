@@ -13,6 +13,7 @@ from DatasetMng.IndexMng import get_index_from_dir
 import matplotlib.pyplot as plt
 import pickle
 from sklearn.metrics import r2_score, mean_squared_error
+import time
 
 affinity_data = pd.read_csv('../Preprocess/BindingData.csv', comment='#')
 ecif_data = pd.read_csv(os.path.join(ecif_data_dir, 'ECIF_6.0.csv'), comment='#')
@@ -182,15 +183,16 @@ def estim_not_ext(test_name):
     for i in ids:
         f_prot = os.path.join(test_dir, test_name, "{}\\{}_protein.pdb".format(i, i))
         f_ligd = os.path.join(test_dir, test_name, "{}\\{}_ligand.sdf".format(i, i))
-        pk = predict_ex(f_prot, f_ligd, '6.0')
-        preds.append(pk)
+        # pk = predict_ex(f_prot, f_ligd, '6.0')
+        # preds.append(pk)
         pk_ag = predict_ex_ag(f_prot, f_ligd, ecif_example)
         preds_ag.append(pk_ag)
 
     print("\n")
-    result = pd.DataFrame(preds, ids, columns=["GBT"]).join(
-        pd.DataFrame(preds_ag, ids, columns=["AG"])
-    )
+    result = pd.DataFrame(preds_ag, ids, columns=["GBT"])
+    # result = pd.DataFrame(preds, ids, columns=["GBT"]).join(
+    #     pd.DataFrame(preds_ag, ids, columns=["AG"])
+    # )
 
     print(result)
     # result.to_csv(r"D:\AlexYu\PAFF\tests\20220706\result.csv")
@@ -202,5 +204,9 @@ if __name__ == '__main__':
     # estim_ext(['4djv', '4djy', '4djw', '4djx'], 6.0)
     # estim_ext(['4gmy', '4gj2', '4hw2', '4hw3'], 6.0)
     # estim_ext(['2zc9', '1h1s'], 6.0)
+    start = time.perf_counter()
     estim_not_ext("20220711")
+    end = time.perf_counter()
+    print("\nTime: {}\n".format(round(end - start)))
+    # estim_not_ext("20220719")
 
