@@ -189,13 +189,40 @@ def estim_not_ext(test_name):
         preds_ag.append(pk_ag)
 
     print("\n")
-    result = pd.DataFrame(preds_ag, ids, columns=["GBT"])
+    result = pd.DataFrame(preds_ag, ids, columns=["AG"])
     # result = pd.DataFrame(preds, ids, columns=["GBT"]).join(
     #     pd.DataFrame(preds_ag, ids, columns=["AG"])
     # )
 
     print(result)
     # result.to_csv(r"D:\AlexYu\PAFF\tests\20220706\result.csv")
+
+
+def multi_ligd_estim(test_name):
+    """
+    for extra tests, do estimations on a list of proteins that are not belongs to PDBBind dataset;
+    and multiple choices of ligands are matched to one protein
+    :param test_name: the test folder in which list of proteins can be found
+    :return:
+    """
+    print("\n")
+    ids = os.listdir(os.path.join(test_dir, test_name))
+
+    for i in ids:
+        preds_ag = []
+        lig_name = []
+        f_prot = os.path.join(test_dir, test_name, "{}\\{}_protein.pdb".format(i, i))
+        f_ligs = os.path.join(test_dir, test_name, "{}\\ligs".format(i))
+        for j in os.listdir(f_ligs):
+            f_lig = os.path.join(f_ligs, j)
+            pk_ag = predict_ex_ag(f_prot, f_lig, ecif_example)
+            preds_ag.append(pk_ag)
+            lig_name.append(j[:-4])
+        df_protein_name = pd.DataFrame([i]*len(lig_name), columns=["protein"])
+        df_lig_name = pd.DataFrame(lig_name, columns=["ligand"])
+        df_prediction = pd.DataFrame(preds_ag, columns=["prediction"])
+        result = df_protein_name.join(df_lig_name.join(df_prediction))
+        result.to_csv(os.path.join(test_dir, test_name, "{}\\{}_result.csv".format(i, i)))
 
 
 if __name__ == '__main__':
@@ -205,7 +232,7 @@ if __name__ == '__main__':
     # estim_ext(['4gmy', '4gj2', '4hw2', '4hw3'], 6.0)
     # estim_ext(['2zc9', '1h1s'], 6.0)
     start = time.perf_counter()
-    estim_not_ext("20220711")
+    multi_ligd_estim("20220819")
     end = time.perf_counter()
     print("\nTime: {}\n".format(round(end - start)))
     # estim_not_ext("20220719")
