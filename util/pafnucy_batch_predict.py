@@ -24,7 +24,7 @@ def get_cmd(script, pocket, lig_folder, output_folder):
     cmd = "python {} -l ".format(script)
     for f in os.listdir(lig_folder):
         cmd += os.path.join(lig_folder, f) + " "
-    cmd += "--ligand_format sdf -p {} -o {}".format(pocket, os.path.join(output_folder, "complexes.hdf"))
+    cmd += " -p {} --pocket_format pdb -o {}".format(pocket, os.path.join(output_folder, "complexes.hdf"))
     return cmd
 
 
@@ -40,10 +40,12 @@ def run_directly():
 
 
 def save_script():
-    prepare = "[prepare.py script location]"
-    pocket = "[pocket.mol2 file]"
-    ligands = "[ligand folder]"
-    output = "[output folder]"
+    # prepare = "[prepare.py script location]"
+    prepare = "/home/hlcs/yym/experiments/pafnucy-master/prepare.py"
+    # pocket = "[pocket.mol2 file]"
+    pocket = "/home/hlcs/yym/datasets/0830/pocket.pdb"
+    ligands = "/home/hlcs/yym/datasets/0830/ligs"
+    output = "/home/hlcs/yym/datasets/0830"
     cmd = get_cmd(prepare, pocket, ligands, output)
     with open(os.path.join(output, "script"), "w") as fout:
         fout.write(cmd)
@@ -66,6 +68,7 @@ def add_smiles(f_pred, lig_folder):
 
 
 if __name__ == '__main__':
+    save_script()
     # predictions = "[all_predicions csv file]"
     # add_smiles(predictions, "[ligand folder]")
     pass

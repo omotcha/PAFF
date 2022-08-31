@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 import pickle
 from sklearn.metrics import r2_score, mean_squared_error
 import time
+from tqdm import tqdm
 
 affinity_data = pd.read_csv('../Preprocess/BindingData.csv', comment='#')
 ecif_data = pd.read_csv(os.path.join(ecif_data_dir, 'ECIF_6.0.csv'), comment='#')
@@ -207,13 +208,13 @@ def multi_ligd_estim(test_name):
     """
     print("\n")
     ids = os.listdir(os.path.join(test_dir, test_name))
-
+    start = time.perf_counter()
     for i in ids:
         preds_ag = []
         lig_name = []
         f_prot = os.path.join(test_dir, test_name, "{}\\{}_protein.pdb".format(i, i))
         f_ligs = os.path.join(test_dir, test_name, "{}\\ligs".format(i))
-        for j in os.listdir(f_ligs):
+        for j in tqdm(os.listdir(f_ligs)):
             f_lig = os.path.join(f_ligs, j)
             pk_ag = predict_ex_ag(f_prot, f_lig, ecif_example)
             preds_ag.append(pk_ag)
@@ -224,6 +225,10 @@ def multi_ligd_estim(test_name):
         result = df_protein_name.join(df_lig_name.join(df_prediction))
         result.to_csv(os.path.join(test_dir, test_name, "{}\\{}_result.csv".format(i, i)))
 
+    end = time.perf_counter()
+    print('\n')
+    print('run time: {} seconds'.format(round(end - start)))
+
 
 if __name__ == '__main__':
     # estim_not_ext("20220706")
@@ -231,9 +236,10 @@ if __name__ == '__main__':
     # estim_ext(['4djv', '4djy', '4djw', '4djx'], 6.0)
     # estim_ext(['4gmy', '4gj2', '4hw2', '4hw3'], 6.0)
     # estim_ext(['2zc9', '1h1s'], 6.0)
-    start = time.perf_counter()
-    multi_ligd_estim("20220819")
-    end = time.perf_counter()
-    print("\nTime: {}\n".format(round(end - start)))
+    # start = time.perf_counter()
+    # multi_ligd_estim("20220819")
+    # end = time.perf_counter()
+    # print("\nTime: {}\n".format(round(end - start)))
     # estim_not_ext("20220719")
+    multi_ligd_estim("20220829")
 

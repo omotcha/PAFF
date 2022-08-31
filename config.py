@@ -55,3 +55,7 @@ extra_2020_base = os.path.join(datasets_dir, "pdbbind2020")
 extra_2020_index = os.path.join(extra_2020_base, "index")
 extra_2020_refined = os.path.join(extra_2020_base, "refined-set")
 extra_2020_general_minus_refined = os.path.join(extra_2020_base, "v2020-other-PL")
+
+# for CASF benchmark
+casf_base = os.path.join("E:\\datasets", "casf2016", "CASF-2016")
+casf_core_set = os.path.join(casf_base, "coreset")
